@@ -1,3 +1,6 @@
+mod algorithm;
 fn main() {
-    println!("Hello, world!");
+    println!("＝＝＝Algorithms＝＝＝");
+    println!("prime number");
+    algorithm::prime_number::calc_prime_number(100);
 }
