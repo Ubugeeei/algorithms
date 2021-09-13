@@ -39,4 +39,30 @@ pub fn calc_prime_number2(max_range: i32) {
     n += 2;
   }
   dbg!(prime);
+
+}
+
+/**
+ * 改良版2
+ */
+pub fn calc_prime_number3(max_range: i32) {
+  let mut prime = vec![2, 3];
+
+  let mut n = 5;
+  while n <= max_range {
+    let mut flag = false;
+
+    let mut i = 1;
+    'inner: while prime[i] * prime[i] <= n  {
+      if n % prime[i]  == 0 {
+        flag = true;
+        break 'inner;
+      }
+      i += 1;
+    }
+
+    if !flag { prime.push(n); }
+    n += 2;
+  }
+  dbg!(prime);
 }
