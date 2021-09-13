@@ -13,3 +13,24 @@ pub fn calc_prime_number(max_range: isize) {
   }
   dbg!(prime_numbers);
 }
+
+pub fn calc_prime_number2(max_range: i32) {
+  let mut prime = vec![2, 3];
+  let mut ptr = 2;
+
+  let mut n = 5;
+  while n <= max_range {
+
+    let mut i = 1;
+    'inner: while i < ptr  {
+      if n % prime[i]  == 0 { break 'inner; }
+      i += 1;
+    }
+    if ptr == i {
+      ptr += 1;
+      prime.push(n);
+    }
+    n += 2;
+  }
+  dbg!(prime);
+}
