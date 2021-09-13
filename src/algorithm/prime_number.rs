@@ -2,12 +2,15 @@
  * 愚直
  */
 pub fn calc_prime_number(max_range: isize) {
+  // パフォーマンス計測のために助産回数をカウント
+  let mut div_count = 0;
   let mut prime_numbers = vec![];
 
   for num in 1..max_range+1 {
     let mut divisor_count = 0;
 
     for i in 1..num+1 {
+      div_count += 1;
       if num % i == 0 { divisor_count += 1 }
     }
 
@@ -15,12 +18,15 @@ pub fn calc_prime_number(max_range: isize) {
     if divisor_count == 2 { prime_numbers.push(num) }
   }
   dbg!(prime_numbers);
+  println!("dix count of 'calc_prime_number': {:?}", div_count);
 }
 
 /**
  * 改良版
  */
 pub fn calc_prime_number2(max_range: i32) {
+  // パフォーマンス計測のために助産回数をカウント
+  let mut div_count = 0;
   let mut prime = vec![2, 3];
   let mut ptr = 2;
 
@@ -29,6 +35,7 @@ pub fn calc_prime_number2(max_range: i32) {
 
     let mut i = 1;
     'inner: while i < ptr  {
+      div_count += 1;
       if n % prime[i]  == 0 { break 'inner; }
       i += 1;
     }
@@ -38,14 +45,17 @@ pub fn calc_prime_number2(max_range: i32) {
     }
     n += 2;
   }
-  dbg!(prime);
 
+  dbg!(prime);
+  println!("dix count of 'calc_prime_number': {:?}", div_count);
 }
 
 /**
  * 改良版2
  */
 pub fn calc_prime_number3(max_range: i32) {
+  // パフォーマンス計測のために助産回数をカウント
+  let mut div_count = 0;
   let mut prime = vec![2, 3];
 
   let mut n = 5;
@@ -54,6 +64,7 @@ pub fn calc_prime_number3(max_range: i32) {
 
     let mut i = 1;
     'inner: while prime[i] * prime[i] <= n  {
+      div_count += 1;
       if n % prime[i]  == 0 {
         flag = true;
         break 'inner;
@@ -64,5 +75,7 @@ pub fn calc_prime_number3(max_range: i32) {
     if !flag { prime.push(n); }
     n += 2;
   }
+
   dbg!(prime);
+  println!("dix count of 'calc_prime_number': {:?}", div_count);
 }
