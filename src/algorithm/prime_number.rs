@@ -1,3 +1,6 @@
+/**
+ * 愚直
+ */
 pub fn calc_prime_number(max_range: isize) {
   let mut prime_numbers = vec![];
 
@@ -14,6 +17,9 @@ pub fn calc_prime_number(max_range: isize) {
   dbg!(prime_numbers);
 }
 
+/**
+ * 改良版
+ */
 pub fn calc_prime_number2(max_range: i32) {
   let mut prime = vec![2, 3];
   let mut ptr = 2;
