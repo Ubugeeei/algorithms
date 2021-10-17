@@ -1,2 +1,14 @@
 pub mod bogo;
 pub mod bubble;
+pub mod cocktail;
+pub mod comb;
+pub mod selection;
+pub mod gnome;
+pub mod insertion;
+pub mod bucket;
+pub mod shell;
+pub mod count;
+pub mod radix;
+pub mod quick;
+pub mod merge;
+pub mod heap;
