@@ -1,6 +1,7 @@
 /**
  * 愚直
  */
+#[allow(dead_code)]
 fn calc_prime_number(max_range: isize) -> Vec<isize> {
     // パフォーマンス計測のために助産回数をカウント
     let mut div_count = 0;
@@ -28,6 +29,7 @@ fn calc_prime_number(max_range: isize) -> Vec<isize> {
 /**
  * 改良版
  */
+#[allow(dead_code)]
 fn calc_prime_number2(max_range: usize) -> Vec<usize> {
     // パフォーマンス計測のために助産回数をカウント
     let mut div_count = 0;
@@ -50,12 +52,15 @@ fn calc_prime_number2(max_range: usize) -> Vec<usize> {
         }
         n += 2;
     }
+    println!("div count: {}", div_count);
+
     prime
 }
 
 /**
  * 改良版2
  */
+#[allow(dead_code)]
 fn calc_prime_number3(max_range: i32) -> Vec<i32> {
     // パフォーマンス計測のために助産回数をカウント
     let mut div_count = 0;
@@ -80,6 +85,8 @@ fn calc_prime_number3(max_range: i32) -> Vec<i32> {
         }
         n += 2;
     }
+    println!("div count: {}", div_count);
+
     prime
 }
 

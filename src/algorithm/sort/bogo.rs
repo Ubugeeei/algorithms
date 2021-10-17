@@ -2,6 +2,7 @@
 // ただのシャッフル
 use rand::seq::SliceRandom;
 
+#[allow(dead_code)]
 fn bogo_sort(numbers: &Vec<isize>) -> Vec<isize> {
     let mut copy = numbers.clone();
     let mut rng = rand::thread_rng();
@@ -9,14 +10,16 @@ fn bogo_sort(numbers: &Vec<isize>) -> Vec<isize> {
     copy
 }
 
+#[allow(dead_code)]
 fn in_order(numbers: &Vec<isize>) -> bool {
-    let mut copy = numbers.clone();
+    let copy = numbers.clone();
     for i in 0..copy.len() - 1 {
         if copy[i] > copy[i + 1] { return false }
     }
     true
 }
 
+#[allow(dead_code)]
 fn bogo_in_order(numbers: Vec<isize>) -> Vec<isize> {
   let copy = numbers.clone();
   let mut sorted = bogo_sort(&copy);
