@@ -35,13 +35,13 @@ mod tess {
     #[test]
     fn test_bogo_sort() {
         let result = bogo_sort(&vec![1, 2, 3, 4, 5, 6, 7, 8, 9]);
-        assert_ne!(vec![1, 2, 3], result);
+        assert_ne!(vec![1, 2, 3, 4, 5, 6, 7, 8, 9], result);
     }
 
     #[test]
     fn test_bogo_in_order() {
         let mut result = bogo_sort(&vec![1, 2, 3, 4, 5, 6, 7, 8, 9]);
-        assert_ne!(vec![1, 2, 3], result);
+        assert_ne!(vec![1, 2, 3, 5, 6, 7, 8, 9], result);
         result = bogo_in_order(result);
         assert_eq!(vec![1, 2, 3, 4, 5, 6, 7, 8, 9], result);
     }
