@@ -14,19 +14,21 @@ fn bogo_sort(numbers: &Vec<isize>) -> Vec<isize> {
 fn in_order(numbers: &Vec<isize>) -> bool {
     let copy = numbers.clone();
     for i in 0..copy.len() - 1 {
-        if copy[i] > copy[i + 1] { return false }
+        if copy[i] > copy[i + 1] {
+            return false;
+        }
     }
     true
 }
 
 #[allow(dead_code)]
 fn bogo_in_order(numbers: Vec<isize>) -> Vec<isize> {
-  let copy = numbers.clone();
-  let mut sorted = bogo_sort(&copy);
-  while !in_order(&sorted) {
-    sorted = bogo_sort(&sorted);
-  }
-  sorted
+    let copy = numbers.clone();
+    let mut sorted = bogo_sort(&copy);
+    while !in_order(&sorted) {
+        sorted = bogo_sort(&sorted);
+    }
+    sorted
 }
 
 #[cfg(test)]
