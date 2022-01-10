@@ -1,3 +1,4 @@
+// O(n^2)
 #[allow(dead_code)]
 fn bubble_sort(numbers: &Vec<isize>) -> Vec<isize> {
     let mut copy = numbers.clone();

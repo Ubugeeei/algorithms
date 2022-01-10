@@ -1,5 +1,6 @@
 // Bogoソート: テキトーに並び替えるソート
 // ただのシャッフル
+// O((n +1)!)
 use rand::seq::SliceRandom;
 
 #[allow(dead_code)]

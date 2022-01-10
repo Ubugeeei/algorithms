@@ -5,6 +5,7 @@
 /// 終端まで一周したらswapをfalseに戻す。次は終端から戦闘に向けてループ。
 /// 先頭まで行ったらまた先頭からループ。というのを繰り返し、
 /// swapがずっとfalseだった時点で処理を終了する
+// O(n^2)
 #[allow(dead_code)]
 fn cocktail_sort(numbers: &Vec<isize>) -> Vec<isize> {
     let mut copy = numbers.clone();
@@ -38,7 +39,9 @@ fn cocktail_sort(numbers: &Vec<isize>) -> Vec<isize> {
         end = end - 1;
         loop {
             start -= 1;
-            if start < end { break; }
+            if start < end {
+                break;
+            }
             let i = start;
             if copy[i] > copy[i + 1] {
                 let _i = copy[i + 1];
