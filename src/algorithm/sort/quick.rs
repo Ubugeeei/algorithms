@@ -2,13 +2,13 @@
 
 #[allow(dead_code)]
 fn partition(nums: &mut Vec<i32>, low: i32, high: i32) -> i32 {
-  let pivot = nums[high as usize];
-  let mut i = low;
+    let pivot = nums[high as usize];
+    let mut i = low;
 
     for j in low..high {
         if nums[j as usize] <= pivot {
-          nums.swap(i as usize, j as usize);
-          i += 1;
+            nums.swap(i as usize, j as usize);
+            i += 1;
         }
     }
 
