@@ -1,2 +1,4 @@
 mod algorithm;
-fn main() {}
+fn main() {
+    println!("Hello, algorithms!");
+}
