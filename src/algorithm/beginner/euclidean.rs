@@ -18,6 +18,12 @@ fn euclidean(_a: i32, _b: i32) -> i32 {
     b
 }
 
+#[allow(dead_code)]
+fn euclidean_tri(a: i32, b: i32, c: i32) -> i32 {
+    let res = euclidean(a, b);
+    euclidean(res, c)
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
@@ -30,5 +36,10 @@ mod test {
     #[test]
     fn test_euclidean2() {
         assert_eq!(euclidean(123, 777), 3);
+    }
+
+    #[test]
+    fn test_euclidean_tri() {
+        assert_eq!(euclidean_tri(8, 24, 56), 8);
     }
 }
