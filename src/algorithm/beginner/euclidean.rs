@@ -24,6 +24,19 @@ fn euclidean_tri(a: i32, b: i32, c: i32) -> i32 {
     euclidean(res, c)
 }
 
+#[allow(dead_code)]
+fn euclidean_multi(a: &[i32]) -> i32 {
+    let mut idx = 0;
+    let mut b = a[idx];
+    loop {
+        if idx == a.len() - 1 {
+            break b;
+        }
+        b = euclidean(b, a[idx + 1]);
+        idx += 1;
+    }
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
@@ -41,5 +54,10 @@ mod test {
     #[test]
     fn test_euclidean_tri() {
         assert_eq!(euclidean_tri(8, 24, 56), 8);
+    }
+
+    #[test]
+    fn test_euclidean_multi() {
+        assert_eq!(euclidean_multi(&[8, 24, 56]), 8);
     }
 }
