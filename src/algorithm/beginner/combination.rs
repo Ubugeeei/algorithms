@@ -23,12 +23,11 @@ fn solution(item_list: Vec<u32>) -> u32 {
     count_100 * count_400 + count_200 * count_300
 }
 
-// N枚のカードがあり、左からi番目（1≦i≦N）のカードの色はAiです。Ai=1のとき赤色、Ai=2のとき黄色、Ai=3のとき青色です。同じ色のカードを2枚選ぶ方法は何通りありますか。
 #[allow(dead_code)]
 fn solution2(item_list: Vec<u32>) -> u32 {
     fn re(c1: u32, c2: u32, c3: u32, c4: u32, i: u32, _item_list: &Vec<u32>) -> u32 {
         if i == _item_list.len() as u32 {
-            return c1 * c4 + c2 * c4;
+            return c1 * c4 + c2 * c3;
         }
 
         match _item_list[i as usize] {
@@ -41,6 +40,50 @@ fn solution2(item_list: Vec<u32>) -> u32 {
     }
 
     re(0, 0, 0, 0, 0, &item_list)
+}
+
+// N枚のカードがあり、左からi番目（1≦i≦N）のカードの色はAiです。Ai=1のとき赤色、Ai=2のとき黄色、Ai=3のとき青色です。同じ色のカードを2枚選ぶ方法は何通りありますか。
+//
+#[allow(dead_code)]
+fn solution3(cards: Vec<u32>) -> u32 {
+    let (mut red_count, mut yellow_count, mut blue_count) = (0, 0, 0);
+
+    fn c(_all: u32, _i: u32) -> u32 {
+        let mut all = _all;
+        let mut i = _i;
+
+        let mut deno = i;
+        let mut nume = all;
+
+        loop {
+            i -= 1;
+            all -= 1;
+            if i == 0 {
+                break;
+            }
+            deno = deno * i;
+            nume = nume * all
+        }
+
+        nume / deno
+    }
+
+    for card in cards.iter() {
+        match card {
+            1 => {
+                red_count += 1;
+            }
+            2 => {
+                yellow_count += 1;
+            }
+            3 => {
+                blue_count += 1;
+            }
+            _ => {}
+        }
+    }
+
+    c(red_count, 2) + c(yellow_count, 2) + c(blue_count, 2)
 }
 
 #[cfg(test)]
@@ -63,5 +106,11 @@ mod tests {
             solution(vec![100, 200, 300, 400, 200, 300, 200, 200, 100, 400]),
             12
         );
+    }
+
+    #[test]
+    fn test_combinatin3() {
+        assert_eq!(solution3(vec![1, 1, 2, 2, 3, 3]), 3);
+        assert_eq!(solution(vec![1, 2, 3]), 0);
     }
 }
