@@ -56,14 +56,14 @@ fn counting_sort(nums: &Vec<isize>, place: isize) -> Vec<isize> {
     sorted
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-    #[test]
-    fn test_radix_sort() {
-        assert_eq!(
-            vec![10, 11, 24, 55, 101, 201, 324],
-            radix_sort(&vec![24, 10, 11, 324, 201, 101, 55])
-        )
-    }
-}
+// #[cfg(test)]
+// mod tests {
+//     use super::*;
+//     #[test]
+//     fn test_radix_sort() {
+//         assert_eq!(
+//             vec![10, 11, 24, 55, 101, 201, 324],
+//             radix_sort(&vec![24, 10, 11, 324, 201, 101, 55])
+//         )
+//     }
+// }
