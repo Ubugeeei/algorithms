@@ -1,6 +1,5 @@
+// ex1)
 // コンビニにはN個の品物が売られており、i番目（1≦i≦N）の商品の値段はAi円です。異なる2つの品物を買う方法のうち、合計値段が500円となるものは何通りありますか。
-// 制約：2≦N≦200000,Aiは100,200,300,400のいずれか
-
 #[allow(dead_code)]
 fn solution(item_list: Vec<u32>) -> u32 {
     let mut count_100 = 0;
@@ -42,8 +41,8 @@ fn solution2(item_list: Vec<u32>) -> u32 {
     re(0, 0, 0, 0, 0, &item_list)
 }
 
+// ex2)
 // N枚のカードがあり、左からi番目（1≦i≦N）のカードの色はAiです。Ai=1のとき赤色、Ai=2のとき黄色、Ai=3のとき青色です。同じ色のカードを2枚選ぶ方法は何通りありますか。
-//
 #[allow(dead_code)]
 fn solution3(cards: Vec<u32>) -> u32 {
     let (mut red_count, mut yellow_count, mut blue_count) = (0, 0, 0);
@@ -84,6 +83,28 @@ fn solution3(cards: Vec<u32>) -> u32 {
     }
 
     c(red_count, 2) + c(yellow_count, 2) + c(blue_count, 2)
+}
+
+// ex3)
+// カードには整数Aiが書かれています。カードを5枚選ぶ方法のうち、選んだカードに書かれた整数の和がちょうど1000となるものは何通りありますか。
+#[allow(dead_code)]
+fn solution4(cards: Vec<u32>) -> u32 {
+    let mut count = 0;
+    for card in cards.iter() {
+        for _card in cards.iter() {
+            for __card in cards.iter() {
+                for ___card in cards.iter() {
+                    for ____card in cards.iter() {
+                        if card + _card + __card + ___card + ____card == 1000 {
+                            count += 1;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    count
 }
 
 #[cfg(test)]
