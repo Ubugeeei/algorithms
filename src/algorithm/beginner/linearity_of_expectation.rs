@@ -17,6 +17,20 @@ fn sol(n: u32) -> f32 {
     (result / n) as f32
 }
 
+// ある国語のテストの問題はN問からなり、すべて選択式問題です。
+// i問目(1≦i≦N)はPi個の選択肢から1つの正解を選ぶ形式であり、配点はQi点です。
+// 太郎君はまったく手がかりがつかめなかったので、全部の問題をランダムに解答することにしました。
+// 太郎君が得られる点数の期待値を計算してください。
+// 1 ≦ N ≦ 50,    2 ≦ Pi ≦ 9,    1 ≦ Qi ≦ 200
+#[allow(dead_code)]
+fn sol3_4_6(n: u32, pi: u32, qi: u32) -> f32 {
+    if n < 1 || n > 50 || pi < 2 || pi > 9 || qi < 1 || qi > 200 {
+        panic!("range error!");
+    } else {
+        return ((qi / pi) * n) as f32;
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -24,5 +38,10 @@ mod tests {
     #[test]
     fn test_sol() {
         assert_eq!(sol(4), 5f32);
+    }
+
+    #[test]
+    fn test_sol3_4_6() {
+        assert_eq!(sol3_4_6(3, 4, 100), 75f32);
     }
 }
