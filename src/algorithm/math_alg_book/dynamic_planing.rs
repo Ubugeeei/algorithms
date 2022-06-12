@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 // a1=0,a2=2
 // an=min(an1+|hn1－hn|,an2+|hn2－hn|)(n≧3）
 // ただし、数列hの最初の5項は8,6,9,2,1であるとする
@@ -82,6 +84,25 @@ fn sol_dp_1(steps: Vec<i32>) -> i32 {
     dp[(dp.len() - 1) as usize]
 }
 
+// 太郎君はN段の階段を上ろうとしています。
+// 彼は一歩で1段か2段上ることができます。
+// 0段目から出発し、N段目にたどり着くまでの移動方法が何通りあるかを計算してください。
+#[allow(dead_code)]
+fn sol_dp_2(n: i32) -> i32 {
+    let mut memo: HashMap<i32, i32> = HashMap::new();
+    memo.insert(0, 1);
+    memo.insert(1, 1);
+
+    for i in 2..(n + 1) {
+        memo.insert(
+            i,
+            *memo.get(&(i - 1)).unwrap() + *memo.get(&(i - 2)).unwrap(),
+        );
+    }
+
+    *memo.get(&n).unwrap()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -98,5 +119,11 @@ mod tests {
     #[test]
     fn test_dp() {
         assert_eq!(sol_dp_1(vec![8, 6, 9, 2, 1]), 7);
+    }
+
+    #[test]
+    fn test_dp2() {
+        assert_eq!(sol_dp_2(6), 13);
+        assert_eq!(sol_dp_2(10), 89);
     }
 }
