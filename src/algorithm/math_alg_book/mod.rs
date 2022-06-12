@@ -1,4 +1,5 @@
 pub mod combination;
+pub mod divide_and_conquer;
 pub mod divisor;
 pub mod euclidean;
 pub mod factorial;
