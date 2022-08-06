@@ -1,7 +1,5 @@
 pub mod combination;
-pub mod divide_and_conquer;
 pub mod divisor;
-pub mod dynamic_planing;
 pub mod euclidean;
 pub mod factorial;
 pub mod linearity_of_expectation;

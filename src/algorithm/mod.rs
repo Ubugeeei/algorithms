@@ -1,4 +1,4 @@
-pub mod list;
-pub mod math_alg_book;
-pub mod others;
+pub mod basic;
+pub mod divide_and_conquer;
+pub mod dp;
 pub mod sort;
