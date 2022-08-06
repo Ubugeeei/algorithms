@@ -33,9 +33,6 @@ impl MSequence {
   }
 
   fn next(&mut self) -> u32 {
-    // let x = self.value;
-    // self.value = ((x >> 1) ^ x) as u32;
-    // self.value
     let b = ((self.value >> (self.p - 1)) ^ (self.value >> (self.q - 1))) & 1;
     self.value = ((self.value << 1) | b) & self.mask;
     self.value
