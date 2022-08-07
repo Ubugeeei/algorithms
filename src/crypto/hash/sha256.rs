@@ -5,7 +5,6 @@
 pub struct SHA256;
 
 impl SHA256 {
-
   /**
    * constant
    */
@@ -29,7 +28,6 @@ impl SHA256 {
   pub fn new() -> Self {
     SHA256
   }
-  
   fn add_padding(self, message: &Vec<u8>) -> Vec<u8> {
     let len = message.len();
     let mut tmp = vec![0x00; SHA256::BLOCK_SIZE];
@@ -65,9 +63,18 @@ mod tests {
 
   #[test]
   fn test_sha256_padding() {
-    let sha256 = SHA256::new();
-    let pdd = sha256.add_padding(&vec![]);
-    assert_eq!(pdd.len(), 64);
-    assert_eq!(pdd[0], 0x80);
+    {
+      let sha256 = SHA256::new();
+      let pdd = sha256.add_padding(&vec![]);
+      assert_eq!(pdd.len(), 64);
+      assert_eq!(pdd[0], 0x80);
+    }
+    {
+      let sha256 = SHA256::new();
+      let pdd = sha256.add_padding(&vec![1, 2, 3, 4, 5, 6, 7, 8]);
+      assert_eq!(pdd.len(), 64);
+      assert_eq!(pdd[0], 1);
+      assert_eq!(pdd[8], 0x80);
+    }
   }
 }
