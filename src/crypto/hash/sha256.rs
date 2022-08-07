@@ -28,19 +28,28 @@ impl SHA256 {
   pub fn new() -> Self {
     SHA256
   }
-  fn add_padding(self, message: &Vec<u8>) -> Vec<u8> {
+
+  pub fn add_padding(self, message: &Vec<u8>) -> Vec<u8> {
+    const SIZE_BYTES: usize = 8;
+
     let len = message.len();
+
     let mut tmp = vec![0x00; SHA256::BLOCK_SIZE];
     tmp[0] = SHA256::DELIMITER;
 
     // add padding
     let mut padded = message.clone();
-    padded = if len % SHA256::BLOCK_SIZE < 56 {
-      vec![padded, tmp[0..(56 - len % SHA256::BLOCK_SIZE)].to_vec()].concat()
+    padded = if len % SHA256::BLOCK_SIZE < SHA256::BLOCK_SIZE - SIZE_BYTES {
+      vec![
+        padded,
+        tmp[0..(SHA256::BLOCK_SIZE - SIZE_BYTES - len % SHA256::BLOCK_SIZE)].to_vec(),
+      ]
+      .concat()
     } else {
       vec![
         padded,
-        tmp[0..(SHA256::BLOCK_SIZE + 56 - len % SHA256::BLOCK_SIZE)].to_vec(),
+        tmp[0..(SHA256::BLOCK_SIZE + SHA256::BLOCK_SIZE - SIZE_BYTES - len % SHA256::BLOCK_SIZE)]
+          .to_vec(),
       ]
       .concat()
     };
