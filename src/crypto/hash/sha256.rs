@@ -29,6 +29,8 @@ impl SHA256 {
     SHA256
   }
 
+  /// add padding and sizes to the message
+  /// returns: 64 bytes as a u8 array
   pub fn add_padding(self, message: &Vec<u8>) -> Vec<u8> {
     const SIZE_BYTES: usize = 8;
 
@@ -63,6 +65,16 @@ impl SHA256 {
     size[7] = (len_bits >> 0) as u8;
 
     vec![padded, size].concat()
+  }
+
+  /**
+   * utils
+   */
+  fn rotr(self, x: u32, n: u32) -> u32 {
+    (x >> n) | (x << (32 - n))
+  }
+  fn shr(self, x: u32, n: u32) -> u32 {
+    x >> n
   }
 }
 
