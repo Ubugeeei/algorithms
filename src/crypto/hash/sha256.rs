@@ -63,27 +63,26 @@ impl SHA256 {
             .wrapping_add(message[p + 3])
         } else {
           (self
-            .gamma1(w[t - 2])
+            .sigma1(w[t - 2])
             .wrapping_add(w[t - 7])
-            .wrapping_add(self.gamma0(w[t - 15]))
+            .wrapping_add(self.sigma0(w[t - 15]))
             .wrapping_add(w[t - 16]))
             & 0xffffffff
         };
       }
 
-      let mut a = h[0];
-      let mut b = h[1];
-      let mut c = h[2];
-      let mut d = h[3];
-      let mut e = h[4];
-      let mut f = h[5];
-      let mut g = h[6];
-      let mut hh = h[7];
+      #[rustfmt::skip]
+      let (
+        mut a, mut b, mut c, mut d,
+        mut e, mut f, mut g, mut hh
+      ) =(
+        h[0], h[1], h[2], h[3],
+        h[4], h[5], h[6], h[7]
+      );
 
       for t in 0..SHA256::BLOCK_SIZE {
-        // TODO:
-        let t1 = hh + self.sigma1(e) + self.ch(e, f, g) + SHA256::K[t] + w[t] & 0xffffffff;
-        let t2 = self.sigma0(a) + self.maj(a, b, c) & 0xffffffff;
+        let t1 = hh + self.SIGMA1(e) + self.ch(e, f, g) + SHA256::K[t] + w[t] & 0xffffffff;
+        let t2 = self.SIGMA0(a) + self.maj(a, b, c) & 0xffffffff;
         hh = g;
         g = f;
         f = e;
@@ -101,29 +100,25 @@ impl SHA256 {
   /**
    * funuctions
    */
-  fn rotr(self, x: u32, n: u32) -> u32 {
-    (x >> n) | (x << (32 - n))
-  }
-  fn shr(self, x: u32, n: u32) -> u32 {
-    x >> n
-  }
   fn ch(self, x: u32, y: u32, z: u32) -> u32 {
     (x & y) ^ (!x & z)
   }
   fn maj(self, x: u32, y: u32, z: u32) -> u32 {
-    (x & y) ^ (x & z) ^ (y & z)
+    (x & y) ^ (y & z) ^ (z & x)
+  }
+  #[allow(non_snake_case)]
+  fn SIGMA0(self, x: u32) -> u32 {
+    x.rotate_right(2) ^ x.rotate_right(13) ^ x.rotate_right(22)
+  }
+  #[allow(non_snake_case)]
+  fn SIGMA1(self, x: u32) -> u32 {
+    x.rotate_right(6) ^ x.rotate_right(11) ^ x.rotate_right(25)
   }
   fn sigma0(self, x: u32) -> u32 {
-    self.rotr(x, 2) ^ self.rotr(x, 13) ^ self.rotr(x, 22)
+    x.rotate_right(7) ^ x.rotate_right(18) ^ (x >> 3)
   }
   fn sigma1(self, x: u32) -> u32 {
-    self.rotr(x, 6) ^ self.rotr(x, 11) ^ self.rotr(x, 25)
-  }
-  fn gamma0(self, x: u32) -> u32 {
-    self.rotr(x, 7) ^ self.rotr(x, 18) ^ self.shr(x, 3)
-  }
-  fn gamma1(self, x: u32) -> u32 {
-    self.rotr(x, 17) ^ self.rotr(x, 19) ^ self.shr(x, 10)
+    x.rotate_right(17) ^ x.rotate_right(19) ^ (x >> 10)
   }
 
   /// add padding and sizes to the message
