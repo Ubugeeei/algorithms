@@ -34,20 +34,27 @@ impl SHA256 {
     SHA256
   }
 
-  /// calculate the hash of the message
-  pub fn hash(self, message: &Vec<u8>) -> Vec<u32> {
-    let message: Vec<u32> = message.iter().map(|n| *n as u32).collect();
-    let n = message.len() / SHA256::BLOCK_SIZE;
-    let mut w = vec![0; SHA256::BLOCK_SIZE];
-    let mut h = vec![];
+  pub fn exec(self, message: String) -> String {
+    let bytes = message.into_bytes();
+    let padded = self.add_padding(&bytes);
+    dbg!(bytes.len());
+    let hashed = self.hash(&padded, bytes.len());
+    hashed
+      .iter()
+      .map(|n| format!("{:x}", n))
+      .collect::<Vec<String>>()
+      .join("")
+  }
 
-    for (i, it) in SHA256::H.iter().enumerate() {
-      h[i] = *it;
-    }
+  /// calculate the hash of the message
+  pub fn hash(self, message: &Vec<u32>, messge_len: usize) -> Vec<u32> {
+    let message: Vec<u32> = message.iter().map(|n| *n as u32).collect();
+    let n = messge_len / SHA256::BLOCK_SIZE;
+    let mut w = vec![0; SHA256::BLOCK_SIZE];
+    let h = SHA256::H.to_vec();
 
     for i in 1..n {
       for t in 0..SHA256::BLOCK_SIZE {
-        // TODO:
         w[t] = if t < 16 {
           let p = (i - 1) * SHA256::BLOCK_SIZE + t * 4;
           (message[p] << 24)
@@ -177,5 +184,13 @@ mod tests {
       assert_eq!(pdd[0], 1);
       assert_eq!(pdd[8], 0x80);
     }
+  }
+
+  #[test]
+  fn test_sha256_exec() {
+    let sha256 = SHA256::new();
+    let message = String::from("hello");
+    let res = sha256.exec(message);
+    dbg!(res);
   }
 }
