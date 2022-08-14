@@ -2,12 +2,25 @@
 
 #![allow(dead_code)]
 
+macro_rules! ch {
+  ($x:expr, $y:expr, $z:expr) => {
+    ($x & $y) ^ (!$x & $z)
+  };
+}
+macro_rules! maj {
+  ($x:expr, $y:expr, $z:expr) => {
+    ($x & $y) ^ ($x & $z) ^ ($y & $z)
+  };
+}
+
 #[derive(Copy, Clone)]
 pub struct SHA256;
 
 impl SHA256 {
   /**
+   *
    * constant
+   *
    */
   const BLOCK_SIZE: usize = 64;
   const DELIMITER: u32 = 0x80;
@@ -28,17 +41,26 @@ impl SHA256 {
   ];
 
   /**
+   *
    * constructor
+   *
    */
   pub fn new() -> Self {
     SHA256
   }
 
+  /**
+   *
+   * get hashed string
+   *
+   */
   pub fn exec(self, message: String) -> String {
     let bytes = message.into_bytes();
     let padded = self.add_padding(&bytes);
-    dbg!(bytes.len());
-    let hashed = self.hash(&padded, bytes.len());
+    let blocks = self.separate_to_blocks(padded);
+    let hashed = self.hash(blocks);
+
+    // convert hashed bytes to hex string
     hashed
       .iter()
       .map(|n| format!("{:x}", n))
@@ -47,92 +69,100 @@ impl SHA256 {
   }
 
   /// calculate the hash of the message
-  pub fn hash(self, message: &Vec<u32>, messge_len: usize) -> Vec<u32> {
-    let message: Vec<u32> = message.iter().map(|n| *n as u32).collect();
-    let n = messge_len / SHA256::BLOCK_SIZE;
-    let mut w = vec![0; SHA256::BLOCK_SIZE];
-    let h = SHA256::H.to_vec();
+  pub fn hash(self, blocks: Vec<[u32; 16]>) -> [u32; 8] {
+    let mut state = SHA256::H.clone();
 
-    for i in 1..n {
-      for t in 0..SHA256::BLOCK_SIZE {
-        w[t] = if t < 16 {
-          let p = (i - 1) * SHA256::BLOCK_SIZE + t * 4;
-          (message[p] << 24)
-            .wrapping_add(message[p + 1] << 16)
-            .wrapping_add(message[p + 2] << 8)
-            .wrapping_add(message[p + 3])
-        } else {
-          (self
+    for block in blocks {
+      let w = {
+        let mut w = [0; SHA256::BLOCK_SIZE];
+
+        for t in 0..SHA256::BLOCK_SIZE / 4 {
+          w[t] = block[t];
+        }
+
+        for t in (SHA256::BLOCK_SIZE / 4)..SHA256::BLOCK_SIZE {
+          w[t] = self
             .sigma1(w[t - 2])
             .wrapping_add(w[t - 7])
             .wrapping_add(self.sigma0(w[t - 15]))
-            .wrapping_add(w[t - 16]))
-            & 0xffffffff
-        };
-      }
+            .wrapping_add(w[t - 16]);
+        }
 
-      #[rustfmt::skip]
-      let (
-        mut a, mut b, mut c, mut d,
-        mut e, mut f, mut g, mut hh
-      ) =(
-        h[0], h[1], h[2], h[3],
-        h[4], h[5], h[6], h[7]
+        w
+      };
+      let (mut a, mut b, mut c, mut d, mut e, mut f, mut g, mut h) = (
+        state[0], state[1], state[2], state[3], state[4], state[5], state[6], state[7],
       );
 
+      print!("\n");
       for t in 0..SHA256::BLOCK_SIZE {
-        let t1 = hh + self.SIGMA1(e) + self.ch(e, f, g) + SHA256::K[t] + w[t] & 0xffffffff;
-        let t2 = self.SIGMA0(a) + self.maj(a, b, c) & 0xffffffff;
-        hh = g;
+        let t1 = h
+          .wrapping_add(self.SIGMA1(e))
+          .wrapping_add(ch!(e, f, g))
+          .wrapping_add(SHA256::K[t])
+          .wrapping_add(w[t]);
+
+        let t2 = self.SIGMA0(a).wrapping_add(maj!(a, b, c));
+
+        h = g;
         g = f;
         f = e;
-        e = (d + t1) & 0xffffffff;
+        e = d.wrapping_add(t1);
         d = c;
         c = b;
         b = a;
-        a = (t1 + t2) & 0xffffffff;
+        a = t1.wrapping_add(t2);
       }
+      state = [
+        a.wrapping_add(state[0]),
+        b.wrapping_add(state[1]),
+        c.wrapping_add(state[2]),
+        d.wrapping_add(state[3]),
+        e.wrapping_add(state[4]),
+        f.wrapping_add(state[5]),
+        g.wrapping_add(state[6]),
+        h.wrapping_add(state[7]),
+      ];
     }
 
-    h
+    state
   }
 
-  /**
-   * funuctions
-   */
-  fn ch(self, x: u32, y: u32, z: u32) -> u32 {
-    (x & y) ^ (!x & z)
-  }
-  fn maj(self, x: u32, y: u32, z: u32) -> u32 {
-    (x & y) ^ (y & z) ^ (z & x)
-  }
-  #[allow(non_snake_case)]
-  fn SIGMA0(self, x: u32) -> u32 {
-    x.rotate_right(2) ^ x.rotate_right(13) ^ x.rotate_right(22)
-  }
-  #[allow(non_snake_case)]
-  fn SIGMA1(self, x: u32) -> u32 {
-    x.rotate_right(6) ^ x.rotate_right(11) ^ x.rotate_right(25)
-  }
-  fn sigma0(self, x: u32) -> u32 {
-    x.rotate_right(7) ^ x.rotate_right(18) ^ (x >> 3)
-  }
-  fn sigma1(self, x: u32) -> u32 {
-    x.rotate_right(17) ^ x.rotate_right(19) ^ (x >> 10)
+  // FIXME: magic number
+  fn separate_to_blocks(self, padded: Vec<u8>) -> Vec<[u32; 16]> {
+    let mut blocks = Vec::with_capacity(padded.len() / 512);
+    let mut idx = 0;
+    let mut shift = 32;
+    let mut block = [0; 16];
+    for byte in padded.iter() {
+      shift -= 8;
+      block[idx] |= (*byte as u32) << shift;
+      if shift == 0 {
+        idx += 1;
+        shift = 32;
+      }
+      if idx == 16 {
+        blocks.push(block);
+        block = [0; 16];
+        idx = 0;
+      }
+    }
+    blocks
   }
 
+  /// pre-prpcess
   /// add padding and sizes to the message
   /// returns: 64 bytes as a u8 array
-  pub fn add_padding(self, message: &Vec<u8>) -> Vec<u32> {
+  pub fn add_padding(self, message: &Vec<u8>) -> Vec<u8> {
     const SIZE_BYTES: usize = 8;
 
     let len = message.len();
 
-    let mut tmp = vec![0x00u32; SHA256::BLOCK_SIZE];
-    tmp[0] = SHA256::DELIMITER;
+    let mut tmp: Vec<u8> = vec![0x00; SHA256::BLOCK_SIZE];
+    tmp[0] = SHA256::DELIMITER as u8;
 
     // add padding
-    let mut padded = message.iter().map(|n| *n as u32).collect();
+    let mut padded = message.clone();
     padded = if len % SHA256::BLOCK_SIZE < SHA256::BLOCK_SIZE - SIZE_BYTES {
       vec![
         padded,
@@ -151,12 +181,33 @@ impl SHA256 {
     // add length
     let len_bits = (len * 8) as u64;
     let mut size = vec![0x00; 8];
-    size[4] = (len_bits >> 24) as u32;
-    size[5] = (len_bits >> 16) as u32;
-    size[6] = (len_bits >> 8) as u32;
-    size[7] = (len_bits >> 0) as u32;
+    size[4] = (len_bits >> 24) as u8;
+    size[5] = (len_bits >> 16) as u8;
+    size[6] = (len_bits >> 8) as u8;
+    size[7] = (len_bits >> 0) as u8;
 
     vec![padded, size].concat()
+  }
+
+  /**
+   *
+   * bit opes funuctions
+   *
+   */
+
+  #[allow(non_snake_case)]
+  fn SIGMA0(self, x: u32) -> u32 {
+    x.rotate_right(2) ^ x.rotate_right(13) ^ x.rotate_right(22)
+  }
+  #[allow(non_snake_case)]
+  fn SIGMA1(self, x: u32) -> u32 {
+    x.rotate_right(6) ^ x.rotate_right(11) ^ x.rotate_right(25)
+  }
+  fn sigma0(self, x: u32) -> u32 {
+    x.rotate_right(7) ^ x.rotate_right(18) ^ (x >> 3)
+  }
+  fn sigma1(self, x: u32) -> u32 {
+    x.rotate_right(17) ^ x.rotate_right(19) ^ (x >> 10)
   }
 }
 
@@ -167,14 +218,14 @@ mod tests {
   #[test]
   fn test_sha256_padding() {
     {
-      let sha256 = SHA256::new();
-      let pdd = sha256.add_padding(&vec![]);
+      let hasher = SHA256::new();
+      let pdd = hasher.add_padding(&vec![]);
       assert_eq!(pdd.len(), 64);
       assert_eq!(pdd[0], 0x80);
     }
     {
-      let sha256 = SHA256::new();
-      let pdd = sha256.add_padding(&vec![1, 2, 3, 4, 5, 6, 7, 8]);
+      let hasher = SHA256::new();
+      let pdd = hasher.add_padding(&vec![1, 2, 3, 4, 5, 6, 7, 8]);
       assert_eq!(pdd.len(), 64);
       assert_eq!(pdd[0], 1);
       assert_eq!(pdd[8], 0x80);
@@ -183,9 +234,12 @@ mod tests {
 
   #[test]
   fn test_sha256_exec() {
-    let sha256 = SHA256::new();
-    let message = String::from("hello");
-    let res = sha256.exec(message);
-    dbg!(res);
+    let hasher = SHA256::new();
+    let message = String::from("hello world");
+    let res = hasher.exec(message);
+    assert_eq!(
+      res,
+      "b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9"
+    );
   }
 }
