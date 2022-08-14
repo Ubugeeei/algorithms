@@ -2,20 +2,8 @@
 
 #![allow(dead_code)]
 
-macro_rules! ch {
-  ($x:expr, $y:expr, $z:expr) => {
-    ($x & $y) ^ (!$x & $z)
-  };
-}
-macro_rules! maj {
-  ($x:expr, $y:expr, $z:expr) => {
-    ($x & $y) ^ ($x & $z) ^ ($y & $z)
-  };
-}
-
 #[derive(Copy, Clone)]
 pub struct SHA256;
-
 impl SHA256 {
   /**
    *
@@ -55,12 +43,15 @@ impl SHA256 {
    *
    */
   pub fn exec(self, message: String) -> String {
+    // convert message to hasher input
     let bytes = message.into_bytes();
-    let padded = self.add_padding(&bytes);
+    let padded = self.add_padding(bytes);
     let blocks = self.separate_to_blocks(padded);
+
+    // hash
     let hashed = self.hash(blocks);
 
-    // convert hashed bytes to hex string
+    // convert hashed bytes to joined hex string
     hashed
       .iter()
       .map(|n| format!("{:x}", n))
@@ -90,19 +81,19 @@ impl SHA256 {
 
         w
       };
+
       let (mut a, mut b, mut c, mut d, mut e, mut f, mut g, mut h) = (
         state[0], state[1], state[2], state[3], state[4], state[5], state[6], state[7],
       );
 
-      print!("\n");
       for t in 0..SHA256::BLOCK_SIZE {
         let t1 = h
           .wrapping_add(self.SIGMA1(e))
-          .wrapping_add(ch!(e, f, g))
+          .wrapping_add(self.ch(e, f, g))
           .wrapping_add(SHA256::K[t])
           .wrapping_add(w[t]);
 
-        let t2 = self.SIGMA0(a).wrapping_add(maj!(a, b, c));
+        let t2 = self.SIGMA0(a).wrapping_add(self.maj(a, b, c));
 
         h = g;
         g = f;
@@ -113,6 +104,7 @@ impl SHA256 {
         b = a;
         a = t1.wrapping_add(t2);
       }
+
       state = [
         a.wrapping_add(state[0]),
         b.wrapping_add(state[1]),
@@ -153,7 +145,7 @@ impl SHA256 {
   /// pre-prpcess
   /// add padding and sizes to the message
   /// returns: 64 bytes as a u8 array
-  pub fn add_padding(self, message: &Vec<u8>) -> Vec<u8> {
+  pub fn add_padding(self, message: Vec<u8>) -> Vec<u8> {
     const SIZE_BYTES: usize = 8;
 
     let len = message.len();
@@ -194,6 +186,13 @@ impl SHA256 {
    * bit opes funuctions
    *
    */
+
+  fn ch(self, x: u32, y: u32, z: u32) -> u32 {
+    (x & y) ^ (!x & z)
+  }
+  fn maj(self, x: u32, y: u32, z: u32) -> u32 {
+    (x & y) ^ (x & z) ^ (y & z)
+  }
 
   #[allow(non_snake_case)]
   fn SIGMA0(self, x: u32) -> u32 {
