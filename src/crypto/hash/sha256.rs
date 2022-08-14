@@ -52,7 +52,7 @@ impl SHA256 {
     // convert message to hasher input
     let bytes = message.into_bytes();
     let padded = self.add_padding(bytes);
-    let blocks = self.separate_to_blocks(padded);
+    let blocks = self.into_512bit_blocks(padded);
 
     // hash
     let hashed = self.hash(blocks);
@@ -127,8 +127,10 @@ impl SHA256 {
     state
   }
 
-  // FIXME: magic number
-  fn separate_to_blocks(self, padded: Vec<u8>) -> Vec<[u32; 16]> {
+  /// pre-prpcess
+  /// Parse the padded message into N 512-bit message blocks
+  /// https://csrc.nist.gov/csrc/media/publications/fips/180/2/archive/2002-08-01/documents/fips180-2.pdf#page=23
+  fn into_512bit_blocks(self, padded: Vec<u8>) -> Vec<[u32; 16]> {
     let mut blocks = Vec::with_capacity(padded.len() / 512);
     let mut idx = 0;
     let mut shift = 32;
@@ -264,11 +266,11 @@ mod tests {
   }
 
   #[test]
-  fn test_separate_to_blocks() {
+  fn test_into_512bit_blocks() {
     {
       let hasher = SHA256::new();
       assert_eq!(
-        hasher.separate_to_blocks(vec![
+        hasher.into_512bit_blocks(vec![
           0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
           0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
           0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -285,7 +287,7 @@ mod tests {
     {
       let hasher = SHA256::new();
       assert_eq!(
-        hasher.separate_to_blocks(vec![
+        hasher.into_512bit_blocks(vec![
           0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
           0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
           0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
