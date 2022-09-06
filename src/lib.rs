@@ -6,3 +6,4 @@ pub mod list;
 pub mod random_number;
 pub mod search_list;
 pub mod sort;
+pub mod stack_and_queue;
