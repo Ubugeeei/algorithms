@@ -18,7 +18,7 @@ struct Node<T> {
 }
 
 impl<T> Node<T> {
-  fn new(v: T) -> Node<T> {
+  fn new(_v: T) -> Node<T> {
     todo!("implement!");
   }
 }
