@@ -72,4 +72,16 @@ pub mod tests {
         assert_eq!(stack.pop(), None);
         assert_eq!(stack.top, 0);
     }
+
+    #[test]
+    #[should_panic]
+    fn test_stack_overflow() {
+        let mut stack: Stack<i32> = Stack::new(5);
+        stack.push(1);
+        stack.push(2);
+        stack.push(3);
+        stack.push(4);
+        stack.push(5);
+        stack.push(6);
+    }
 }
